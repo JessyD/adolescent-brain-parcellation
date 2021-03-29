@@ -1,4 +1,6 @@
 .DS_Store
-/code/log
+.ipynb_checkpoints
+code/log
 *.lst
-/code/qc/subject_lists/*
+code/qc/subject_lists/*
+code/qc/*
