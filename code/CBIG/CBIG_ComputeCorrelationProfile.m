@@ -87,7 +87,7 @@ function CBIG_ComputeCorrelationProfile(seed_mesh, target, output_file1, output_
 %
 %
 % Written by CBIG under MIT license: https://github.com/ThomasYeoLab/CBIG/blob/master/LICENSE.md
-
+setenv('FREESURFER_HOME','/Applications/freesurfer/7.1.1');
 % read target and seed meshs
 if(~isempty(strfind(seed_mesh, 'fsaverage')))
     lh_seed_avg_mesh = CBIG_ReadNCAvgMesh('lh', seed_mesh, 'inflated', 'cortex');
@@ -97,7 +97,8 @@ if(~isempty(strfind(seed_mesh, 'fsaverage')))
     rh_avg_mesh = CBIG_ReadNCAvgMesh('rh', target, 'inflated', 'cortex');
 elseif(~isempty(strfind(seed_mesh, 'fs_LR')))
     if(strcmp(seed_mesh, 'fs_LR_900') && strcmp(target, 'fs_LR_32k'))
-        s_mesh = ft_read_cifti('/Users/jperaza/Documents/GitHub/adolescent-brain-parcellation/scripts/utils/templates/fs_LR_32k_downsample_900/fslr_downsample_900mesh_parcellation.dlabel.nii');
+        s_mesh = ft_read_cifti(fullfile(getenv('CBIG_CODE_DIR'), 'data', 'templates', 'surface', ...
+            'fs_LR_32k_downsample_900', 'fslr_downsample_900mesh_parcellation.dlabel.nii'));
     else
         error('For fs_LR space, we only support seed_mesh = ''fs_LR_900'' and target = ''fs_LR_32k''.')
     end
@@ -362,9 +363,6 @@ else
     if(str2num(threshold) < 1)
         corr_mat1(corr_mat1 <  t) = 0;
         corr_mat1(corr_mat1 >= t) = 1;
-        
-        %disp(corr_mat1)
-        %disp(size(corr_mat1))
         write_fmri(output_file1, input_series, corr_mat1', [input_size(1:end-1) size(corr_mat1, 1)]);
         
         if(~isempty(strfind(target, 'fsaverage')))
