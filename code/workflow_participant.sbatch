@@ -1,12 +1,17 @@
 #!/bin/bash
 
+pwd; hostname; date
 set -e
+
+#==============Shell script==============#
+# Load the software needed
+# module load matlab
+
 ###############
 # Variables
 export MATLAB_DIR=/Applications/MATLAB_R2020b.app
 export PATH=$MATLAB_DIR/bin:$PATH
 MATLAB=$(which matlab)
-echo "$MATLAB"
 export CBIG_CODE_DIR=/Users/jperaza/Documents/GitHub/adolescent-brain-parcellation/code/CBIG
 BIDS_DIR="/Users/jperaza/Documents/GitHub/adolescent-brain-parcellation-old/dataset/abcd"
 DERIVS_DIR=${BIDS_DIR}/derivatives
@@ -14,20 +19,14 @@ DCAN_DIR=${DERIVS_DIR}/abcd-hcp-pipeline
 PARCELLAITON_DIR=${DERIVS_DIR}/abcd-yeo-parcellation
 
 bolds_list=$1
-echo "$bolds_list"
 bolds=(`cat $bolds_list`)
 # bold=${bolds[${SLURM_ARRAY_TASK_ID} - 1]}
-bold_id=${bolds[0]}
-echo "$bold_id"
+bold_id=${bolds[9]}
 
-#base=$(basename ${bold})
-#tempboldfile="${base%%.*}"
-#sub=$(echo ${base} | awk -F'-' '{print $2}' | awk -F'_' '{print $1}')
-#ses=$(echo ${base} | awk -F'-' '{print $3}' | awk -F'_' '{print $1}')
 sub=$(echo ${bold_id} | awk -F'_' '{print $1}' | awk -F'-' '{print $2}')
 ses=$(echo ${bold_id} | awk -F'_' '{print $2}' | awk -F'-' '{print $2}')
+task=rest
 sufix="task-rest_bold_desc-filtered_timeseries"
-echo "Processing sub: ${sub}, ses: ${ses}, file: ${bold_id}"
 
 ###########################
 # compute correlation profile
@@ -37,7 +36,7 @@ scrub_flag=1
 scrub_thr=0.2
 seed_mesh='fs_LR_900'
 target='fs_LR_32k'
-output_file1=${PARCELLAITON_DIR}/sub-${sub}/ses-${ses}/surf/${bold_id}_task-rest_surf2surf-profile.mat
+output_file1=${PARCELLAITON_DIR}/sub-${sub}/ses-${ses}/surf/${bold_id}_task-${task}_surf2surf-profile.mat
 output_file2='NONE'
 threshold='0.1'
 varargin_file1=${DCAN_DIR}/sub-${sub}/ses-${ses}/func/${bold_id}_${sufix}.dtseries.nii
@@ -45,7 +44,8 @@ varargin_file2='NONE'
 split_data='0'
 
 echo "Start=================================="
-if [ -e ${output_file1} ] && [ -e ${output_file2} ]; then
+echo "Compute Correlation Profile for sub: ${sub}, ses: ${ses}, task: ${task}"
+if [ -e ${output_file1} ]; then
 	echo "Outputs already exist. Skipping......"
 else
 	cmd="$MATLAB -nodesktop -nodisplay -nosplash -r "
@@ -57,12 +57,12 @@ else
 	if [ $scrub_flag == 1 ]; then
 		## Generate outlier file
 		mkdir -p ${PARCELLAITON_DIR}/sub-${sub}/ses-${ses}/qc
-		outlier_text=${PARCELLAITON_DIR}/sub-${sub}/ses-${ses}/qc/${bold_id}_task-rest_outliers-motion.txt
+		outlier_text=${PARCELLAITON_DIR}/sub-${sub}/ses-${ses}/qc/${bold_id}_task-${task}_outliers-motion.txt
 		#rm -f ${outlier_text}
 		if [ -e ${outlier_text} ]; then
 			echo "Outlier text file already exist. Skipping......"
 		else
-			qualities=($(ls ${DCAN_DIR}/sub-${sub}/ses-${ses}/func/sub-${sub}_ses-${ses}_task-rest_run-*_desc-filteredincludingFD_motion.tsv))
+			qualities=($(ls ${DCAN_DIR}/sub-${sub}/ses-${ses}/func/sub-${sub}_ses-${ses}_task-${task}_run-*_desc-filteredincludingFD_motion.tsv))
 			for quality in ${qualities[@]}; do
 				FDs=($(cut -f1 ${quality} | awk '{print $NF}'))
 				for (( i = 4; i < ${#FDs[@]}; i++ )); do
@@ -78,4 +78,9 @@ else
 	fi
 	echo Commandline: $cmd
 	eval $cmd
+	exitcode=$?
 fi
+
+#echo Finished tasks ${SLURM_ARRAY_TASK_ID} with exit code $exitcode
+echo Finished tasks 2 with exit code $exitcode
+date
