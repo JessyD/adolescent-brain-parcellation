@@ -80,7 +80,7 @@ if(~isempty(strfind(mesh_name, 'fsaverage')))
     l = [l1 l2+length(lh_avg_mesh.MARS_label)];
 else
     % mesh.l: 0 - medial wall, 1 - cortex
-    [mesh.v, mesh.l, mesh.ct] = read_annotation('/Users/jperaza/Documents/GitHub/adolescent-brain-parcellation/scripts/utils/templates/fs_LR_32k/label/medialwall.annot');
+    [mesh.v, mesh.l, mesh.ct] = read_annotation(fullfile(getenv('CBIG_CODE_DIR'), 'data', 'templates', 'surface', 'fs_LR_32k', 'label', 'medialwall.annot'));
     lh_num_verts = length(mesh.l) / 2;
     rh_num_verts = lh_num_verts;
     cort_label = mesh.ct.table(2, 5);
