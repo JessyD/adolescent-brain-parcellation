@@ -1,19 +1,32 @@
 #!/bin/bash
+#SBATCH --job-name=abcd-parcellation
+#SBATCH --time=80:00:00
+#SBATCH --nodes=1
+#SBATCH --ntasks=1
+#SBATCH --cpus-per-task=1
+#SBATCH --mem-per-cpu=10gb
+#SBATCH --account=iacc_nbc
+#SBATCH --qos=pq_nbc
+#SBATCH --partition=investor
+# Outputs ----------------------------------
+#SBATCH --output=log/abcd-parcellation-%j.out
+#SBATCH --error=log/abcd-parcellation-%j.err
+#SBATCH --mail-type=ALL
+#SBATCH --mail-user=jperaza@fiu.edu
+# ------------------------------------------
 
 pwd; hostname; date
 set -e
 
 #==============Shell script==============#
 # Load the software needed
-# module load matlab
+module load matlab-2019b
 
 ###############
 # Variables
-export MATLAB_DIR=/Applications/MATLAB_R2020b.app
-export PATH=$MATLAB_DIR/bin:$PATH
 MATLAB=$(which matlab)
-export CBIG_CODE_DIR=/Users/jperaza/Documents/GitHub/adolescent-brain-parcellation/code/CBIG
-BIDS_DIR="/Users/jperaza/Documents/GitHub/adolescent-brain-parcellation-old/dataset/abcd"
+export CBIG_CODE_DIR=/home/jpera054/Documents/abcd-parcellation/code/CBIG
+BIDS_DIR="/home/jpera054/Documents/abcd-parcellation"
 DERIVS_DIR=${BIDS_DIR}/derivatives
 DCAN_DIR=${DERIVS_DIR}/abcd-hcp-pipeline
 PARCELLAITON_DIR=${DERIVS_DIR}/abcd-yeo-parcellation

@@ -34,7 +34,7 @@ for i = 1:length(varargin)
   if(i == 1)
     output = x;
   else
-    output.vol = output.profile_mat + x.profile_mat;
+    output.profile_mat = output.profile_mat + x.profile_mat;
   end
 end
 toc
