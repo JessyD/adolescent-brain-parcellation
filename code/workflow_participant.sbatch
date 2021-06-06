@@ -25,6 +25,7 @@ module load matlab-2019b
 ###############
 # Variables
 MATLAB=$(which matlab)
+WB_DIR=/home/jpera054/Documents/workbench/bin_rh_linux64
 export CBIG_CODE_DIR=/home/jpera054/Documents/abcd-parcellation/code/CBIG
 BIDS_DIR="/home/jpera054/Documents/abcd-parcellation"
 DERIVS_DIR=${BIDS_DIR}/derivatives
@@ -39,6 +40,24 @@ sub=$(echo ${bold_id} | awk -F'_' '{print $1}' | awk -F'-' '{print $2}')
 ses=$(echo ${bold_id} | awk -F'_' '{print $2}' | awk -F'-' '{print $2}')
 task=rest
 sufix="task-rest_bold_desc-filtered_timeseries"
+sm_sufix="task-rest_bold_desc-filteredSM6mm_timeseries"
+
+###########################
+# Smooth
+echo Smoothing 6mm
+Sigma=`awk 'BEGIN { SmoothingFWHM = 6; print SmoothingFWHM / ( 2 * ( sqrt ( 2 * log( 2 ) ) ) ) }'`
+TEMPLATE_DIR=${CBIG_CODE_DIR}/data/templates/surface/fs_LR_32k
+if [ -e ${DCAN_DIR}/sub-${sub}/ses-${ses}/func/${bold_id}_${sm_sufix}.dtseries.nii ]; then
+	echo "Outputs already exist. Skipping......"
+else
+	${WB_DIR}/wb_command -cifti-smoothing \
+	    ${DCAN_DIR}/sub-${sub}/ses-${ses}/func/${bold_id}_${sufix}.dtseries.nii \
+	    ${Sigma} \
+	    ${Sigma} \
+	    COLUMN \
+	    ${DCAN_DIR}/sub-${sub}/ses-${ses}/func/${bold_id}_${sm_sufix}.dtseries.nii \
+	    -left-surface ${TEMPLATE_DIR}/fsaverage.L.midthickness_orig.32k_fs_LR.surf.gii \
+	    -right-surface ${TEMPLATE_DIR}/fsaverage.R.midthickness_orig.32k_fs_LR.surf.gii
 
 ###########################
 # compute correlation profile
@@ -51,7 +70,7 @@ target='fs_LR_32k'
 output_file1=${PARCELLAITON_DIR}/sub-${sub}/ses-${ses}/surf/${bold_id}_task-${task}_surf2surf-profile.mat
 output_file2='NONE'
 threshold='0.1'
-varargin_file1=${DCAN_DIR}/sub-${sub}/ses-${ses}/func/${bold_id}_${sufix}.dtseries.nii
+varargin_file1=${DCAN_DIR}/sub-${sub}/ses-${ses}/func/${bold_id}_${sm_sufix}.dtseries.nii
 varargin_file2='NONE'
 split_data='0'
 
