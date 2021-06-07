@@ -113,6 +113,5 @@ else
 	exitcode=$?
 fi
 
-#echo Finished tasks ${SLURM_ARRAY_TASK_ID} with exit code $exitcode
-echo Finished tasks 2 with exit code $exitcode
+echo Finished tasks ${SLURM_ARRAY_TASK_ID} with exit code $exitcode
 date
