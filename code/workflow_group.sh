@@ -42,15 +42,16 @@ done
 
 mesh_name='fs_LR_32k'
 mask='NONE'
-num_clusters=17;
+# For 7 cluster use '07'
+num_clusters='17'
 output_file=${PARCELLAITON_DIR}/group/parcellation-${num_clusters}_task-${task}.mat
 profile1=${PARCELLAITON_DIR}/group/group-average_task-${task}_surf2surf-profile.mat
-profile2='NONE';
-num_smooth='0';
-num_tries='1000';
-normalize='0';
-max_iter='100';
-no_silhouette='1';
+profile2='NONE'
+num_smooth='0'
+num_tries='1000'
+normalize='0'
+max_iter='100'
+no_silhouette='1'
 
 echo "Start=================================="
 echo "Compute Average Correlation Profile for ${#corr_profiles[@]} subjects of task: ${task}"
