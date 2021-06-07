@@ -45,11 +45,12 @@ sm_sufix="task-rest_bold_desc-filteredSM6mm_timeseries"
 ###########################
 # Smooth
 echo Smoothing 6mm
-Sigma=`awk 'BEGIN { SmoothingFWHM = 6; print SmoothingFWHM / ( 2 * ( sqrt ( 2 * log( 2 ) ) ) ) }'`
 TEMPLATE_DIR=${CBIG_CODE_DIR}/data/templates/surface/fs_LR_32k
 if [ -e ${DCAN_DIR}/sub-${sub}/ses-${ses}/func/${bold_id}_${sm_sufix}.dtseries.nii ]; then
 	echo "Outputs already exist. Skipping......"
 else
+	export OMP_NUM_THREADS=${SLURM_CPUS_PER_TASK}
+	Sigma=`awk 'BEGIN { SmoothingFWHM = 6; print SmoothingFWHM / ( 2 * ( sqrt ( 2 * log( 2 ) ) ) ) }'`
 	${WB_DIR}/wb_command -cifti-smoothing \
 	    ${DCAN_DIR}/sub-${sub}/ses-${ses}/func/${bold_id}_${sufix}.dtseries.nii \
 	    ${Sigma} \
