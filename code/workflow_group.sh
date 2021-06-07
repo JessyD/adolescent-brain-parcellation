@@ -72,5 +72,22 @@ else
 	exitcode=$?
 fi
 
+# Plot Figure
+output_fig=${PARCELLAITON_DIR}/group/parcellation-${num_clusters}_task-${task}.jpg
+if [ -e ${output_fig} ]; then
+	echo "Outputs already exist. Skipping......"
+else
+	ref_file=${CBIG_CODE_DIR}/data/1000subjects_reference/1000subjects_clusters0${num_clusters}_ref.mat
+	
+	cmd="$MATLAB -nodesktop -nodisplay -nosplash -r "
+	cmd="$cmd \" addpath(genpath(fullfile('$CBIG_CODE_DIR')));"
+
+    cmd="$cmd VisualizeCluster('${output_file}', '${num_clusters}', '${ref_file}',"
+	cmd="$cmd '${mesh_name}', '${output_fig}'); exit; \" "
+	
+	echo Commandline: $cmd
+	eval $cmd
+fi
+
 echo Finished group task with exit code $exitcode
 date

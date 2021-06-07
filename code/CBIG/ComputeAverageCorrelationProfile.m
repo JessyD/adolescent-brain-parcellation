@@ -1,13 +1,4 @@
 function ComputeAverageCorrelationProfile(corr_profiles_list, ave_profile1)
-% Average all freesurfer volumes.
-% 
-%   CBIG_AvgFreeSurferVolumes(varargin_text, output_file)
-%   Input:
-%       varargin_text: text file including all mat files
-%       output_file  : output file name
-%
-% Written by CBIG under MIT license: https://github.com/ThomasYeoLab/CBIG/blob/master/LICENSE.md
-
 
 % read in files
 fid = fopen(corr_profiles_list, 'r');
