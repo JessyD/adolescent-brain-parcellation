@@ -44,21 +44,20 @@ sm_sufix="task-rest_bold_desc-filteredSM6mm_timeseries"
 
 ###########################
 # Smooth
-echo Smoothing 6mm
-TEMPLATE_DIR=${CBIG_CODE_DIR}/data/templates/surface/fs_LR_32k
 if [ -e ${DCAN_DIR}/sub-${sub}/ses-${ses}/func/${bold_id}_${sm_sufix}.dtseries.nii ]; then
 	echo "Outputs already exist. Skipping......"
 else
 	export OMP_NUM_THREADS=${SLURM_CPUS_PER_TASK}
 	Sigma=`awk 'BEGIN { SmoothingFWHM = 6; print SmoothingFWHM / ( 2 * ( sqrt ( 2 * log( 2 ) ) ) ) }'`
+	echo Smoothing 6mm: Sigma -> $Sigma
 	${WB_DIR}/wb_command -cifti-smoothing \
 	    ${DCAN_DIR}/sub-${sub}/ses-${ses}/func/${bold_id}_${sufix}.dtseries.nii \
 	    ${Sigma} \
 	    ${Sigma} \
 	    COLUMN \
 	    ${DCAN_DIR}/sub-${sub}/ses-${ses}/func/${bold_id}_${sm_sufix}.dtseries.nii \
-	    -left-surface ${TEMPLATE_DIR}/fsaverage.L.midthickness_orig.32k_fs_LR.surf.gii \
-	    -right-surface ${TEMPLATE_DIR}/fsaverage.R.midthickness_orig.32k_fs_LR.surf.gii
+	    -left-surface ${DCAN_DIR}/sub-${sub}/ses-${ses}/anat/sub-${sub}_ses-${ses}_hemi-L_space-MNI_mesh-fsLR32k_midthickness.surf.gii \
+	    -right-surface ${DCAN_DIR}/sub-${sub}/ses-${ses}/anat/sub-${sub}_ses-${ses}_hemi-R_space-MNI_mesh-fsLR32k_midthickness.surf.gii
 
 ###########################
 # compute correlation profile
