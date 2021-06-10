@@ -65,7 +65,7 @@ fi
 ###########################
 mkdir -p ${PARCELLAITON_DIR}/sub-${sub}/ses-${ses}/surf
 scrub_flag=1
-scrub_thr=0.2
+scrub_thr='0.2'
 seed_mesh='fs_LR_900'
 target='fs_LR_32k'
 output_file1=${PARCELLAITON_DIR}/sub-${sub}/ses-${ses}/surf/${bold_id}_task-${task}_surf2surf-profile.mat
@@ -82,27 +82,24 @@ if [ -e ${output_file1} ]; then
 else
 	cmd="$MATLAB -nodesktop -nodisplay -nosplash -r "
 	cmd="$cmd \" addpath(genpath(fullfile('$CBIG_CODE_DIR')));"
-
-	cmd="$cmd CBIG_ComputeCorrelationProfile('${seed_mesh}', '${target}', '${output_file1}',"
-	cmd="$cmd '${output_file2}', '${threshold}', '${varargin_file1}', '${varargin_file2}'"
 	
 	if [ $scrub_flag == 1 ]; then
-		## Generate outlier file
+		## Generate outlier file from *motion_mask.mat
 		mkdir -p ${PARCELLAITON_DIR}/sub-${sub}/ses-${ses}/qc
-		outlier_text=${PARCELLAITON_DIR}/sub-${sub}/ses-${ses}/qc/${bold_id}_task-${task}_outliers-motion.txt
-		#rm -f ${outlier_text}
+		outlier_text=${PARCELLAITON_DIR}/sub-${sub}/ses-${ses}/qc/${bold_id}_task-${task}_outliers-motion${scrub_thr}.txt
 		if [ -e ${outlier_text} ]; then
 			echo "Outlier text file already exist. Skipping......"
 		else
-			qualities=($(ls ${DCAN_DIR}/sub-${sub}/ses-${ses}/func/sub-${sub}_ses-${ses}_task-${task}_run-*_desc-filteredincludingFD_motion.tsv))
-			for quality in ${qualities[@]}; do
-				FDs=($(cut -f1 ${quality} | awk '{print $NF}'))
-				for (( i = 4; i < ${#FDs[@]}; i++ )); do
-					# echo ${FDs[i]}'<'${scrub_thr} | bc -l >> ${outlier_text}
-					echo $(echo ${FDs[i]} ${scrub_thr} | awk '{if ($1 < $2) print 1; else print 0}') >> ${outlier_text}
-				done
-			done
+			mask_file=${DCAN_DIR}/sub-${sub}/ses-${ses}/func/sub-${sub}_ses-${ses}_task-${task}_desc-filtered_motion_mask.mat
+			cmd="$cmd MotionMask2TXT('${mask_file}', '${outlier_text}', '${scrub_thr}');"
 		fi
+	fi
+
+
+	cmd="$cmd CBIG_ComputeCorrelationProfile('${seed_mesh}', '${target}', '${output_file1}',"
+	cmd="$cmd '${output_file2}', '${threshold}', '${varargin_file1}', '${varargin_file2}'"
+
+	if [ $scrub_flag == 1 ]; then
 		# Add outlier argument to matlab cmd and exit
 		cmd="$cmd, '${outlier_text}'); exit; \" "
 	else
