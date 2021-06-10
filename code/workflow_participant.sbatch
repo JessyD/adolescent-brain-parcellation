@@ -58,6 +58,7 @@ else
 	    ${DCAN_DIR}/sub-${sub}/ses-${ses}/func/${bold_id}_${sm_sufix}.dtseries.nii \
 	    -left-surface ${DCAN_DIR}/sub-${sub}/ses-${ses}/anat/sub-${sub}_ses-${ses}_hemi-L_space-MNI_mesh-fsLR32k_midthickness.surf.gii \
 	    -right-surface ${DCAN_DIR}/sub-${sub}/ses-${ses}/anat/sub-${sub}_ses-${ses}_hemi-R_space-MNI_mesh-fsLR32k_midthickness.surf.gii
+fi
 
 ###########################
 # compute correlation profile
