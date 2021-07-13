@@ -49,7 +49,7 @@ if [ -e ${DCAN_DIR}/sub-${sub}/ses-${ses}/func/${bold_id}_${sm_sufix}.dtseries.n
 else
 	export OMP_NUM_THREADS=${SLURM_CPUS_PER_TASK}
 	Sigma=`awk 'BEGIN { SmoothingFWHM = 6; print SmoothingFWHM / ( 2 * ( sqrt ( 2 * log( 2 ) ) ) ) }'`
-	echo Smoothing 6mm: Sigma -> $Sigma
+	echo "Smoothing 6mm: Sigma = $Sigma"
 	${WB_DIR}/wb_command -cifti-smoothing \
 	    ${DCAN_DIR}/sub-${sub}/ses-${ses}/func/${bold_id}_${sufix}.dtseries.nii \
 	    ${Sigma} \
