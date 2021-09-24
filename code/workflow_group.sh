@@ -1,44 +1,34 @@
 #!/bin/bash
-#SBATCH --job-name=abcd-parcellation
-#SBATCH --time=80:00:00
-#SBATCH --nodes=1
-#SBATCH --ntasks=1
-#SBATCH --cpus-per-task=1
-#SBATCH --mem-per-cpu=10gb
-#SBATCH --account=iacc_nbc
-#SBATCH --qos=pq_nbc
-#SBATCH --partition=investor
-# Outputs ----------------------------------
-#SBATCH --output=log/abcd-parcellation-%j.out
-#SBATCH --error=log/abcd-parcellation-%j.err
-#SBATCH --mail-type=ALL
-#SBATCH --mail-user=jperaza@fiu.edu
-# ------------------------------------------
 
 pwd; hostname; date
 set -e
 
 #==============Shell script==============#
 # Load the software needed
-module load matlab-2019b
+module load matlab/2020b
 
 ###############
 # Variables
 MATLAB=$(which matlab)
-export CBIG_CODE_DIR=/home/jpera054/Documents/abcd-parcellation/code/CBIG
-BIDS_DIR="/home/jpera054/Documents/abcd-parcellation"
+export CBIG_CODE_DIR=/data/jdafflon/adolescent-brain-parcellation/code/CBIG
+BIDS_DIR="/data/ABCD_MBDU/abcd_bids/bids"
 DERIVS_DIR=${BIDS_DIR}/derivatives
 DCAN_DIR=${DERIVS_DIR}/abcd-hcp-pipeline
-PARCELLAITON_DIR=${DERIVS_DIR}/abcd-yeo-parcellation
-mkdir -p ${PARCELLAITON_DIR}/group
+OUTDIR=/data/NIMH_scratch/abcd_parcellation/abcd_mbdu
+PARCELLAITON_DIR=${OUTDIR}/abcd-yeo-parcellation
+if [ ! -d ${PARCELLATION_DIR}/group ]; then
+    mkdir -p ${PARCELLAITON_DIR}/group
 task='rest'
 
-corr_profiles=($(find ${PARCELLAITON_DIR}/sub-*/ses-*/surf -name *surf2surf-profile.mat))
-corr_profiles_list=${PARCELLAITON_DIR}/group/group-average_task-${task}_surf2surf-profile_list.txt
-rm -f ${corr_profiles_list}
-for profile in ${corr_profiles[@]}; do
-    echo ${profile} >> ${corr_profiles_list}
-done
+# Create file with path to the mat files used 
+#corr_profiles=($(find ${PARCELLAITON_DIR}/sub-*/ses-*/surf -name *surf2surf-profile.mat))
+#corr_profiles_list=${PARCELLAITON_DIR}/group/group-average_task-${task}_surf2surf-profile_list.txt
+#rm -f ${corr_profiles_list}
+#for profile in ${corr_profiles[@]}; do
+#    echo ${profile} >> ${corr_profiles_list}
+#done
+corr_profiles_list=/data/NIMH_scratch/abcd_parcellation/abcd_mbdu/abcd-yeo-parcellation/group/group-average_task-rest_surf2surf-profile_list.txt
+corr_profiles=(`cat "$corr_profiles_list"`)
 
 mesh_name='fs_LR_32k'
 mask='NONE'
